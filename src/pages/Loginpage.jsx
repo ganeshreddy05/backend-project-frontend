@@ -1,119 +1,123 @@
 import { useState } from "react";
 import { setAccessToken } from "../utils/tokens.js";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const LogInPage = () => {
 
-const [username, setUsername] = useState("");
-const [password, setPassword] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
-const navigate = useNavigate();
+    const navigate = useNavigate();
 
-const logInUser = async (event) => {
+    const logInUser = async (event) => {
+        event.preventDefault();
+        setLoading(true);
 
-event.preventDefault();
+        try {
+            const options = {
+                method: "POST",
+                body: JSON.stringify({ username, password }),
+                headers: { "Content-Type": "application/json" },
+                credentials: "include"
+            };
 
-try {
+            const response = await fetch(
+                `${import.meta.env.VITE_API_BASE_URL}/users/login`,
+                options
+            );
 
-const options = {
-method: "POST",
-body: JSON.stringify({
-username,
-password
-}),
-headers: {
-"Content-Type": "application/json"
-},
-credentials: "include"
-};
+            const jsonData = await response.json();
 
-const response = await fetch(
-`${import.meta.env.VITE_API_BASE_URL}/users/login`,
-options
-);
+            if (!response.ok) {
+                throw new Error(jsonData.message || "Login failed");
+            }
 
-const jsonData = await response.json();
+            setAccessToken(jsonData.accessToken);
+            toast.success("Welcome back!");
+            navigate("/dashboard");
 
-setAccessToken(jsonData.accessToken);
-
-navigate("/");
-
-} catch (error) {
-
-console.error(error);
-
-}
-
-};
-
-
-return (
-
-<div className="min-h-screen flex items-center justify-center bg-gray-100">
-
-<div className="bg-white shadow-lg rounded-xl p-8 w-[400px]">
-
-<h2 className="text-2xl font-bold text-center mb-6">
-Login
-</h2>
+        } catch (error) {
+            console.error(error);
+            toast.error(error.message || "Login failed");
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
-<form onSubmit={logInUser} className="space-y-4">
+    return (
+        <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4 relative">
 
-<input
-className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-placeholder="Username"
-value={username}
-onChange={(e)=>setUsername(e.target.value)}
-type="text"
-required
-/>
+            {/* Background glow */}
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/8 blur-[120px] rounded-full pointer-events-none"></div>
 
+            <div className="w-full max-w-sm relative">
 
-<input
-className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-placeholder="Password"
-value={password}
-onChange={(e)=>setPassword(e.target.value)}
-type="password"
-required
-/>
+                {/* Brand */}
+                <div className="text-center mb-8">
+                    <Link to="/" className="text-2xl font-bold text-white">
+                        <span className="text-emerald-400">Smart</span>Pantry
+                    </Link>
+                    <p className="text-slate-500 text-sm mt-2">Sign in to your account</p>
+                </div>
 
+                {/* Form Card */}
+                <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-8 border border-slate-700/50">
+                    <form onSubmit={logInUser} className="space-y-4">
 
-<button
-className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
-type="submit"
->
+                        <div>
+                            <label className="text-sm font-medium text-slate-300 mb-1.5 block">Username</label>
+                            <input
+                                className="w-full bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                placeholder="Enter your username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                type="text"
+                                required
+                            />
+                        </div>
 
-Login
+                        <div>
+                            <label className="text-sm font-medium text-slate-300 mb-1.5 block">Password</label>
+                            <input
+                                className="w-full bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                placeholder="Enter your password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                type="password"
+                                required
+                            />
+                        </div>
 
-</button>
+                        <button
+                            className="w-full bg-emerald-500 hover:bg-emerald-400 text-white p-3 rounded-lg font-medium transition-colors disabled:opacity-50 cursor-pointer shadow-lg shadow-emerald-500/20"
+                            type="submit"
+                            disabled={loading}
+                        >
+                            {loading ? "Signing in..." : "Sign In"}
+                        </button>
 
+                    </form>
+                </div>
 
-</form>
+                {/* Links */}
+                <div className="text-center mt-6 space-y-2">
+                    <p className="text-sm text-slate-500">
+                        Don't have an account?{" "}
+                        <Link to="/register" className="text-emerald-400 font-medium hover:text-emerald-300">
+                            Register
+                        </Link>
+                    </p>
+                    <Link to="/" className="text-xs text-slate-600 hover:text-slate-400 inline-block">
+                        Back to home
+                    </Link>
+                </div>
 
-
-<p className="text-center mt-4 text-sm">
-
-Don't have an account?
-
-<span
-onClick={()=>navigate("/register")}
-className="text-blue-600 cursor-pointer ml-1"
->
-
-Register
-
-</span>
-
-</p>
-
-
-</div>
-
-</div>
-
-);
+            </div>
+        </div>
+    );
 
 };
 

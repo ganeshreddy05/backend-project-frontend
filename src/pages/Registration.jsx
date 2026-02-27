@@ -1,144 +1,161 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import toast from "react-hot-toast";
+
 function Register() {
-const navigate = useNavigate();
-const [formData, setFormData] = useState({
-username: "",
-mobile: "",
-email: "",
-displayName: "",
-role: "user",
-password: ""
-});
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        username: "",
+        mobile: "",
+        email: "",
+        displayName: "",
+        role: "user",
+        password: ""
+    });
 
-const handleChange = (e) => {
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
 
-setFormData({
-...formData,
-[e.target.name]: e.target.value
-});
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
 
-};
+        try {
+            await axios.post(
+                `${import.meta.env.VITE_API_BASE_URL}/users/register`,
+                formData
+            );
 
-
-const handleSubmit = async (e) => {
-
-e.preventDefault();
-
-try {
-
-await axios.post(
-"http://localhost:3000/users/register",
-formData
-);
-
-alert("Registration Successful");
-navigate("/login");
-} catch (error) {
-    console.log(error)
-
-alert("Registration Failed");
-
-}
-
-};
+            toast.success("Account created!");
+            navigate("/login");
+        } catch (error) {
+            console.log(error);
+            toast.error(error.response?.data?.message || "Registration failed");
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
-return (
+    return (
+        <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4 py-10 relative">
 
-<div className="min-h-screen flex items-center justify-center bg-gray-100">
+            {/* Background glow */}
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-teal-500/8 blur-[120px] rounded-full pointer-events-none"></div>
 
-<div className="bg-white shadow-lg rounded-xl p-8 w-[400px]">
+            <div className="w-full max-w-sm relative">
 
-<h2 className="text-2xl font-bold text-center mb-6">
-Register
-</h2>
+                {/* Brand */}
+                <div className="text-center mb-8">
+                    <Link to="/" className="text-2xl font-bold text-white">
+                        <span className="text-emerald-400">Smart</span>Pantry
+                    </Link>
+                    <p className="text-slate-500 text-sm mt-2">Create a new account</p>
+                </div>
 
+                {/* Form Card */}
+                <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-8 border border-slate-700/50">
+                    <form onSubmit={handleSubmit} className="space-y-4">
 
-<form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className="text-sm font-medium text-slate-300 mb-1 block">Username</label>
+                                <input
+                                    type="text"
+                                    name="username"
+                                    placeholder="johndoe"
+                                    value={formData.username}
+                                    onChange={handleChange}
+                                    className="w-full bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-slate-300 mb-1 block">Display Name</label>
+                                <input
+                                    type="text"
+                                    name="displayName"
+                                    placeholder="John Doe"
+                                    value={formData.displayName}
+                                    onChange={handleChange}
+                                    className="w-full bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                    required
+                                />
+                            </div>
+                        </div>
 
-<input
-type="text"
-name="username"
-placeholder="Username"
-value={formData.username}
-onChange={handleChange}
-className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
+                        <div>
+                            <label className="text-sm font-medium text-slate-300 mb-1 block">Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="john@example.com"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className="w-full bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                required
+                            />
+                        </div>
 
+                        <div>
+                            <label className="text-sm font-medium text-slate-300 mb-1 block">Mobile</label>
+                            <input
+                                type="text"
+                                name="mobile"
+                                placeholder="+919876543210"
+                                value={formData.mobile}
+                                onChange={handleChange}
+                                className="w-full bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                required
+                            />
+                        </div>
 
-<input
-type="text"
-name="mobile"
-placeholder="Mobile Number"
-value={formData.mobile}
-onChange={handleChange}
-className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
+                        <div>
+                            <label className="text-sm font-medium text-slate-300 mb-1 block">Password</label>
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="Create a password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                className="w-full bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                required
+                            />
+                        </div>
 
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-emerald-500 hover:bg-emerald-400 text-white p-3 rounded-lg font-medium transition-colors disabled:opacity-50 cursor-pointer shadow-lg shadow-emerald-500/20"
+                        >
+                            {loading ? "Creating..." : "Create Account"}
+                        </button>
 
-<input
-type="email"
-name="email"
-placeholder="Email"
-value={formData.email}
-onChange={handleChange}
-className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
+                    </form>
+                </div>
 
+                {/* Links */}
+                <div className="text-center mt-6 space-y-2">
+                    <p className="text-sm text-slate-500">
+                        Already have an account?{" "}
+                        <Link to="/login" className="text-emerald-400 font-medium hover:text-emerald-300">
+                            Sign In
+                        </Link>
+                    </p>
+                    <Link to="/" className="text-xs text-slate-600 hover:text-slate-400 inline-block">
+                        Back to home
+                    </Link>
+                </div>
 
-<input
-type="text"
-name="displayName"
-placeholder="Display Name"
-value={formData.displayName}
-onChange={handleChange}
-className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
-
-
-<select
-name="role"
-value={formData.role}
-onChange={handleChange}
-className="w-full border p-2 rounded-lg"
->
-
-<option value="user">user</option>
-<option value="teacher">Teacher</option>
-<option value="admin">Admin</option>
-
-</select>
-
-
-<input
-type="password"
-name="password"
-placeholder="Password"
-value={formData.password}
-onChange={handleChange}
-className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
-
-
-<button
-type="submit"
-className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
->
-
-Register
-
-</button>
-
-
-</form>
-
-</div>
-
-</div>
-
-);
+            </div>
+        </div>
+    );
 
 }
 

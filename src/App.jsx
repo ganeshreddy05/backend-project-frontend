@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import useUserStore from "../src/store/useUserStore.js";
-
-import { Link, Outlet } from "react-router";
+import { Outlet } from "react-router";
 import api from "./utils/api";
+import Navbar from "./components/Navbar.jsx";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const setUser = useUserStore((state) => state.setUser);
@@ -26,10 +27,32 @@ function App() {
 
   return (
     <>
-      <nav className="p-6 rounded-lg bg-rose-200 ">
-        <Link to="/profile">My Profile</Link>
-      </nav>
-
+      {/* Toast notifications - shows at top right */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+            fontSize: "14px",
+          },
+          success: {
+            iconTheme: {
+              primary: "#10b981",
+              secondary: "#fff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#fff",
+            },
+          },
+        }}
+      />
+      <Navbar />
       <Outlet />
     </>
   );
