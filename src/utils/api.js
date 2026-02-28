@@ -3,7 +3,7 @@ import { getAccessToken, setAccessToken } from "../utils/tokens.js";
 
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL, //http://localhost:3000
+    baseURL: "https://backend-node-mongodb-lwi6.onrender.com", //http://localhost:3000
     withCredentials: true // send httpOnly Cookies 
 })
 

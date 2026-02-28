@@ -14,7 +14,7 @@ const LogInPage = () => {
         setLoading(true);
         try {
             const options = { method: "POST", body: JSON.stringify({ username, password }), headers: { "Content-Type": "application/json" }, credentials: "include" };
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/login`, options);
+            const response = await fetch("https://backend-node-mongodb-lwi6.onrender.com/users/login", options);
             const jsonData = await response.json();
             if (!response.ok) throw new Error(jsonData.message || "Login failed");
             setAccessToken(jsonData.accessToken);
