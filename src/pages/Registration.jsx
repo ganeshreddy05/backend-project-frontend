@@ -14,7 +14,7 @@ function Register() {
         e.preventDefault();
         setLoading(true);
         try {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/users/register`, formData);
+            await fetch("https://backend-node-mongodb-lwi6.onrender.com/users/register", formData);
             toast.success("Account created!");
             navigate("/login");
         } catch (error) {
