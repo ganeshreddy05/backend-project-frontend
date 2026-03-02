@@ -17,6 +17,7 @@ const LogInPage = () => {
             const response = await fetch("https://backend-node-mongodb-lwi6.onrender.com/users/login", options);
             const jsonData = await response.json();
             if (!response.ok) throw new Error(jsonData.message || "Login failed");
+            localStorage.setItem("accessToken", jsonData.accessToken); 
             setAccessToken(jsonData.accessToken);
             toast.success("Welcome back!");
             navigate("/dashboard");
